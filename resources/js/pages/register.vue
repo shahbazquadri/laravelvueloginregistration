@@ -1,0 +1,162 @@
+<template>
+    <div class="container">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-7 m-auto">
+              <h2 class="text-center text-primary">Register</h2>
+            <form action="" method="post">
+                <input type="text" name="_token" :value="csrf">  
+                <div class="mb-3">
+                    <label for="" class="form-label">Name</label>
+                    <input
+                        v-model="name"
+                        type="text"
+                        name=""
+                        id=""
+                        class="form-control"
+                        placeholder=""
+                        aria-describedby="helpId"
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="" class="form-label">Email</label>
+                    <input
+                        v-model="email"
+                        type="text"
+                        name=""
+                        id=""
+                        class="form-control"
+                        placeholder=""
+                        aria-describedby="helpId"
+                    />
+                </div>
+                <div class="mb-3">
+                    <label for="" class="form-label">Password</label>
+                    <input
+                        v-model="password"
+                        type="text"
+                        name=""
+                        id=""
+                        class="form-control"
+                        placeholder=""
+                        aria-describedby="helpId"
+                    />
+                </div>
+
+                <div class="mb-3">
+                    <label for="" class="form-label">Conform Password</label>
+                    <input
+                        v-model="cpassword"
+                        type="text"
+                        name=""
+                        id=""
+                        class="form-control"
+                        placeholder=""
+                        aria-describedby="helpId"
+                    />
+                </div>
+                <div class="np-captcha-container" onselectstart="return false" onselectend="return false"  onpaste="return false;" onCopy="return false" onCut="return false" onDrag="return false" onDrop="return false" >
+      <div class="np-captcha"  v-if="captcha && captcha.length">
+        <div @click.prevent="createCaptcha" 
+          v-for="(c, i) in captcha"
+          :key="i"
+          :style="{
+            fontSize: getFontSize() + 'rem',
+            fontWeight: 800,
+            transform: 'rotate(' + getRotationAngle() + 'deg)',
+          }"
+          class="np-captcha-character"
+        >
+          {{ c }}
+        </div>
+      </div>
+    </div>
+    <button @click.prevent="createCaptcha" class="np-button">Generate new</button>
+           <div class="row">
+            <div class="col-md-6"><button type="reset" class="btn btn-danger">Clear</button>
+        <button type="submit" class="btn btn-success" v-on:click.prevent="registerUser">Login</button></div>
+           </div>
+
+            </form>
+            </div>
+          </div>
+        </div>
+    </div>
+</template>
+<script>
+export default {
+    data() {
+        return {
+            name: "",
+            email: "",
+            password: "",
+            cpassword: "",
+         captchaLength: 5,
+      captcha: [],
+      enCaptcha:"",
+      csrf:""
+    };
+  },
+  mounted() {
+    this.createCaptcha();
+    this.csrf = window.Laravel.csrfToken;
+  },
+  methods: {
+    registerUser(){
+
+    },
+    createCaptcha() {
+      let tempCaptcha = "";
+      for (let i = 0; i < this.captchaLength; i++) {
+        tempCaptcha += this.getRandomCharacter();
+      }
+      this.captcha = tempCaptcha.split("");
+    },
+    getRandomCharacter() {
+      const symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      const randomNumber = Math.floor(Math.random() * 36);
+      return symbols[randomNumber];
+    },
+    getFontSize() {
+      const fontVariations = [2, 2, 2, 2, 2];
+      return fontVariations[Math.floor(Math.random() * 5)];
+    },
+    getRotationAngle() {
+      const rotationVariations = [5, 10, 20, 25, -5, -10, -20, -25];
+      return rotationVariations[Math.floor(Math.random() * 8)];
+    },
+  },
+};
+</script>
+
+<style cc>
+/* 
+.appnp-captcha-container  {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #000000;
+  margin-top: 60px;
+} */
+.np-captcha-container {
+  background: #eee;
+  width: 300px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+.np-captcha {
+  font-size: 24px;
+}
+.np-button {
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  font-size: 16px;
+}
+.np-captcha-character {
+  display: inline-block;
+  letter-spacing: 14px;
+}
+</style>
