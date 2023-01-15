@@ -4,8 +4,22 @@
           <div class="row">
             <div class="col-md-7 m-auto">
               <h2 class="text-center text-primary">Register</h2>
-            <form action="" method="post">
-                <input type="text" name="_token" :value="csrf">  
+            <form action="" method="post" >
+              <div v-if="success" class="alert alert-success alert-dismissible fade show" role="alert">
+                <button type="button"  class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              
+                <strong>{{success}} </strong> 
+              </div> 
+              <div v-if="errors" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              
+           <ul>
+            <li v-for="error in errors" :key="error">{{error}}</li>
+           </ul>
+              </div>
+              
+              
+                <input type="hidden" name="_token" :value="csrf">  
                 <div class="mb-3">
                     <label for="" class="form-label">Name</label>
                     <input
@@ -94,7 +108,9 @@ export default {
          captchaLength: 5,
       captcha: [],
       enCaptcha:"",
-      csrf:""
+      csrf:"",
+      success:"",
+      errors:""
     };
   },
   mounted() {
@@ -102,8 +118,29 @@ export default {
     this.csrf = window.Laravel.csrfToken;
   },
   methods: {
-    registerUser(){
+  
 
+   
+    registerUser(){
+      
+      axios.post('api/register',{
+          "name":this.name,
+          "email":this.email,
+          "password":this.password,
+          "c_password":this.cpassword,
+          "csrf": this.csrf
+        }).then((res) => {
+          this.errors='';
+          this.success="";
+          this.success = res.data.message;
+        }).catch((error) => {
+            this.errors='';
+          this.success="";
+          this.errors=error.response.data.message;
+          
+        })
+
+       
     },
     createCaptcha() {
       let tempCaptcha = "";

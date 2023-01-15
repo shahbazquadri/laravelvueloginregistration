@@ -10,11 +10,13 @@ use App\Models\User;
 class AuthController extends Controller
 {
     public function register(Request $request){
+        $token = csrf_token();
         $validator =  Validator::make($request->all(),[
             'name' => 'required',
             'email' => 'required|email',
             'password' => 'required',
             'c_password' => 'required|same:password',
+            'csrf' => ["required","in:$token"]
         ]);
         if($validator->fails()){
             $response =[
@@ -29,7 +31,7 @@ class AuthController extends Controller
             
             
 
-            $input['password'] = bcrypt($input['password']);
+            $input['password'] = hash("sha512",$input['password']);
             $user = User::create($input);
             $success['token'] = $user->createToken($user->name)->plainTextToken;
             $success['name']=$user->name;
@@ -45,6 +47,25 @@ class AuthController extends Controller
     }
 
     public function login(Request $request){
+        $token = csrf_token();
+        $validator =  Validator::make($request->all(),[
+           
+            'email' => 'required|email',
+            'password' => 'required',
+         
+            'csrf' => ["required","in:$token"]
+        ]);
+        if($validator->fails()){
+            $response =[
+                'success'=>false,
+                'message'=>$validator->errors(),
+            ];
+            return response()->json($response,400);
+
+        }
+// echo $request->email;
+// echo $request->password;
+// die;
         if(Auth::attempt(['email'=>$request->email,'password'=>$request->password])){
             $user= Auth::user();
             $success['token'] = $user->createToken($user->name)->plainTextToken;

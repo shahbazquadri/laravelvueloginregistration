@@ -5,7 +5,19 @@
           <div class="col-md-7 m-auto">
              <h2 class="text-primary text-center">Login</h2>
             <form action="" method="post">
-           
+              <div v-if="success" class="alert alert-success alert-dismissible fade show" role="alert">
+                <button type="button"  class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              
+                <strong>{{success}} </strong> 
+              </div> 
+              <div v-if="errors" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              
+           <ul>
+            <li v-for="error in errors" :key="error">{{error}}</li>
+           </ul>
+              </div>
+            <input type="hidden" name="_token" :value="csrf">  
                   <div class="mb-3">
               <label for="" class="form-label">Email</label>
               <input v-model="email" type="text" name="" id="" class="form-control" placeholder="" aria-describedby="helpId">
@@ -40,7 +52,7 @@
     <button @click.prevent="createCaptcha" class="np-button">Generate new</button>
            <div class="row">
             <div class="col-md-6"><button type="reset" class="btn btn-danger">Clear</button>
-        <button type="submit" class="btn btn-success">Login</button></div>
+        <button type="submit" v-on:click.prevent="login" class="btn btn-success">Login</button></div>
            </div>
 
             
@@ -59,16 +71,39 @@ export default {
             name:"",
             email:'',
             password:"",
-            cpassword:"",
+           
  captchaLength: 5,
       captcha: [],
-      enCaptcha:""
+      enCaptcha:"",
+      success:"",
+      errors:"",
+      "csrf": this.csrf
     };
   },
   mounted() {
     this.createCaptcha();
+     this.csrf = window.Laravel.csrfToken;
   },
   methods: {
+    login(){
+ axios.post('api/login',{
+        
+          "email":this.email,
+          "password":this.password,
+         
+          "csrf": this.csrf
+        }).then((res) => {
+          this.errors='';
+          this.success="";
+          this.success = res.data.message;
+        }).catch((error) => {
+            this.errors='';
+          this.success="";
+          this.errors=error.response.data.message;
+          
+        })
+
+    },
     createCaptcha() {
       let tempCaptcha = "";
       for (let i = 0; i < this.captchaLength; i++) {
